@@ -18,6 +18,14 @@ func NewBadRequestError(messgae string) *RestErr {
 	}
 }
 
+func NewNotFoundError(messgae string) *RestErr {
+	return &RestErr{
+		Message: messgae,
+		Status:  http.StatusNotFound,
+		Error:   "Not_found",
+	}
+}
+
 // errors to be handeled
 
 // {

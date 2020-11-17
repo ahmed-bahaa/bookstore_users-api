@@ -2,6 +2,7 @@ package users
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/ahmed-bahaa/bookstore_users-api/utils/errors"
 
@@ -20,22 +21,6 @@ func CreateUser(c *gin.Context) {
 		c.JSON(resterr.Status, resterr)
 		return
 	}
-	// ==========> another aproach
-	// fmt.Println("user:", user)
-	// bytes, err := ioutil.ReadAll(c.Request.Body)
-	// if err != nil {
-	// 	// handeling the error
-	// 	fmt.Println(err)
-	// 	return
-	// }
-	// fmt.Println(string(bytes))
-	// err = json.Unmarshal(bytes, &user)
-	// if err != nil {
-	// 	// handeling the error
-	// 	fmt.Println(err)
-	// 	return
-	// }
-
 	result, Saveerr := services.CreateUser(user)
 	if Saveerr != nil {
 		c.JSON(Saveerr.Status, Saveerr)
@@ -46,5 +31,16 @@ func CreateUser(c *gin.Context) {
 }
 
 func GetUser(c *gin.Context) {
-	c.String(http.StatusNotImplemented, "Implement me!")
+
+	userID, UserErr := strconv.ParseInt(c.Param("user_id"), 10, 64)
+	if UserErr != nil {
+		err := errors.NewBadRequestError("User ID should be a number")
+		c.JSON(err.Status, err)
+	}
+
+	user, getErr := services.GetUser(userID)
+	if UserErr != nil {
+		c.JSON(getErr.Status, getErr)
+	}
+	c.JSON(http.StatusOK, user)
 }
