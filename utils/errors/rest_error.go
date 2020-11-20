@@ -26,6 +26,14 @@ func NewNotFoundError(messgae string) *RestErr {
 	}
 }
 
+func NewInteralServerError(messgae string) *RestErr {
+	return &RestErr{
+		Message: messgae,
+		Status:  http.StatusInternalServerError,
+		Error:   "Not_found",
+	}
+}
+
 // errors to be handeled
 
 // {
