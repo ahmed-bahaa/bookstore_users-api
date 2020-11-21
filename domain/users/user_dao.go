@@ -1,8 +1,7 @@
 package users
 
 import (
-	"fmt"
-	"strings"
+	"github.com/ahmed-bahaa/bookstore_users-api/utils/mysql_utils"
 
 	"github.com/ahmed-bahaa/bookstore_users-api/utils/date_utils"
 
@@ -15,7 +14,7 @@ const (
 	queryInsertUser  = "INSERT INTO users(first_name,last_name,email,date_created) VALUES(?, ?, ?, ?);"
 	queryGetUser     = "SELECT id,first_name,last_name,email,date_created FROM users WHERE id=?;"
 	indexUniqueEmail = "email_UNIQUE"
-	errorNoRows      = "no rows in result set"
+	// errorNoRows      = "no rows in result set"
 )
 
 func (user *User) Get() *errors.RestErr {
@@ -30,10 +29,7 @@ func (user *User) Get() *errors.RestErr {
 
 	err = result.Scan(&user.ID, &user.FirstName, &user.LastName, &user.Email, &user.DateCreated)
 	if err != nil {
-		if strings.Contains(err.Error(), errorNoRows) {
-			return errors.NewNotFoundError(fmt.Sprintf(" User %d not found", user.ID))
-		}
-		return errors.NewInteralServerError(fmt.Sprintf("Failed to get the user in the db %d: %s ", user.ID, err.Error()))
+		return mysql_utils.ParseError(err)
 	}
 
 	return nil
@@ -52,15 +48,12 @@ func (user *User) Save() *errors.RestErr {
 
 	insertionResult, err := stmt.Exec(user.FirstName, user.LastName, user.Email, user.DateCreated)
 	if err != nil {
-		if strings.Contains(err.Error(), indexUniqueEmail) {
-			return errors.NewBadRequestError(fmt.Sprintf(" email %s already exist", user.Email))
-		}
-		return errors.NewInteralServerError(fmt.Sprintf("Failed to save the user in the db %s", err.Error()))
+		return mysql_utils.ParseError(err)
 	}
 
 	userID, err := insertionResult.LastInsertId()
 	if err != nil {
-		return errors.NewInteralServerError(fmt.Sprintf("Failed to save the user in the db %s", err.Error()))
+		return mysql_utils.ParseError(err)
 	}
 
 	user.ID = userID
