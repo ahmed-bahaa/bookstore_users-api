@@ -26,3 +26,25 @@ func CreateUser(user users.User) (*users.User, *errors.RestErr) {
 	}
 	return &user, nil
 }
+
+func UpdateUser(user users.User) (*users.User, *errors.RestErr) {
+	currentUser, err := GetUser(user.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	err = currentUser.Validate()
+	if err != nil {
+		return nil, err
+	}
+
+	currentUser.FirstName = user.FirstName
+	currentUser.LastName = user.LastName
+	currentUser.Email = user.Email
+
+	err = currentUser.Update()
+	if err != nil {
+		return nil, err
+	}
+	return &user, nil
+}

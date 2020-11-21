@@ -69,3 +69,7 @@ func (user *User) Save() *errors.RestErr {
 	// userdb[user.ID] = user
 	return nil
 }
+
+func (user *User) Update() *errors.RestErr {
+
+}
