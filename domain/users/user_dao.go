@@ -71,5 +71,6 @@ func (user *User) Save() *errors.RestErr {
 }
 
 func (user *User) Update() *errors.RestErr {
-
+	//test ==?
+	return nil
 }
