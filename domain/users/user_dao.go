@@ -11,9 +11,12 @@ import (
 )
 
 const (
-	queryInsertUser = "INSERT INTO users(first_name,last_name,email,date_created) VALUES(?, ?, ?, ?);"
-	queryGetUser    = "SELECT id,first_name,last_name,email,date_created FROM users WHERE id=?;"
-	queryUpdateUser = "UPDATE users SET first_name=?, last_name=?, email=? WHERE id=?;"
+	queryInsertUser       = "INSERT INTO users(first_name,last_name,email,date_created) VALUES(?, ?, ?, ?);"
+	queryGetUser          = "SELECT id,first_name,last_name,email,date_created FROM users WHERE id=?;"
+	queryUpdateUser       = "UPDATE users SET first_name=?, last_name=?, email=? WHERE id=?;"
+	queryDeleteUser       = "DELETE FROM users WHERE id=?;"
+	queryFindUserByStatus = "SELECT id,first_name,last_name,email,date_created,status FROM users WHERE status=?;"
+
 	// indexUniqueEmail = "email_UNIQUE"
 	// errorNoRows      = "no rows in result set"
 )
@@ -79,6 +82,20 @@ func (user *User) Update() *errors.RestErr {
 	defer stmt.Close()
 
 	_, err = stmt.Exec(user.FirstName, user.LastName, user.Email, user.ID)
+	if err != nil {
+		return mysql_utils.ParseError(err)
+	}
+	return nil
+}
+
+func (user *User) Delete() *errors.RestErr {
+	stmt, err := useres_db.Client.Prepare(queryDeleteUser)
+	if err != nil {
+		return errors.NewInteralServerError(err.Error())
+	}
+	defer stmt.Close()
+
+	_, err = stmt.Exec(user.ID)
 	if err != nil {
 		return mysql_utils.ParseError(err)
 	}
